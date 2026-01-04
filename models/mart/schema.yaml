@@ -1,0 +1,31 @@
+
+models:
+  - name: fct_oncology_executive_summary
+    description: "Final Mart for CEO analysis."
+    columns:
+      # Test 1: Financial Accuracy
+      - name: total_spend
+        description: "The combined medical and pharmacy cost."
+        tests:
+          - not_null
+          # Expectation: Total cost must be non-negative.
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+
+      # Test 2: Outcome Adherence Logic
+      - name: missed_visit_pct
+        description: "Percentage of patient appointments missed."
+        tests:
+          - not_null
+          # Expectation: Percentage must be between 0 and 100.
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 100
+
+      # Test 3: Segment Integrity (Categorical Data)
+      - name: spend_segment_label
+        description: "Classification into High/Medium/Low Spend."
+        tests:
+          # Expectation: The column must only contain these three defined values.
+          - dbt_expectations.expect_column_distinct_values_to_equal_set:
+              value_set: ['High Spend', 'Moderate Spend', 'Low Spend']

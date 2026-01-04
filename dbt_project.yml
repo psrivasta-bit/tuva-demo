@@ -2,7 +2,7 @@ name: 'the_tuva_project_demo'
 version: '0.1.9'
 config-version: 2
 
-profile: default
+profile: 'color_tuva_profile'
 
 vars:
 
@@ -18,6 +18,9 @@ vars:
   # Setting the reporting period to date needed for demo data
   quality_measures_period_end: "2018-12-31"
 
+  oncology_icd10_prefix: 'C'
+  min_high_spend_threshold: 50000
+  'dbt_date:time_zone': 'America/Los_Angeles'
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -28,6 +31,34 @@ target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
+# Specific Configuration for Models
+models:
+  color_oncology_exploration:
+    # 1. Staging: Standardizing the 13 Tuva source tables
+    # These are views to save storage and ensure we always pull the latest data.
+    staging:
+      +materialized: view
+      +schema: staging
+    
+      
+    # 2. Intermediate: The "Joining Engine" 
+    # These contain the complex logic for Cohort IDs and Cost Profiling.
+    intermediate:
+      +materialized: view
+      +schema: intermediate
+      
+
+    # 3. Marts: The final tables for the CEO dashboard
+    # These are materialized as tables for faster performance in BI tools.
+    marts:
+      +materialized: table
+      +schema: marts
+    
+
+
+
+tests:
+  +store_failures: true 
 
 seeds:
   the_tuva_project_demo:

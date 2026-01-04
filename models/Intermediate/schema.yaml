@@ -1,0 +1,10 @@
+models:
+  - name: int_oncology_patient_master
+    description: "The 360-degree patient profile."
+    columns:
+      - name: age_at_diagnosis
+        tests:
+          # Expectation: Age must be within a clinically sensible range.
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 18 # Assuming adult population
+              max_value: 110
